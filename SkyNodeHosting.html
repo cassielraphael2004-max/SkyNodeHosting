@@ -1,0 +1,441 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkyNode Hosting</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-window panel">
+      <p class="eyebrow">SkyNode Hosting Login</p>
+      <h2 class="login-title">Melde dich zuerst im Panel an</h2>
+      <p class="hero-copy">
+        Erst nach dem Login kommst du in dein Hosting-Dashboard.
+      </p>
+      <form id="loginForm" class="form-grid">
+        <label>
+          Benutzername
+          <input id="loginUsername" type="text" placeholder="Benutzername">
+        </label>
+        <label>
+          Passwort
+          <input id="loginPassword" type="password" placeholder="Passwort">
+        </label>
+        <button class="primary-button" type="submit">Einloggen</button>
+      </form>
+      <p class="muted" id="loginStatus">Bitte mit deinem Account einloggen.</p>
+    </div>
+  </div>
+
+  <div class="app-shell app-shell-hidden" id="appShell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">N</div>
+        <div>
+          <p class="eyebrow">Minecraft Hosting</p>
+          <h1>SkyNode Hosting</h1>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Bereiche">
+        <button class="nav-link active" data-section-target="overview" type="button">Uebersicht</button>
+        <button class="nav-link" data-section-target="access" type="button">Zugriff</button>
+        <button class="nav-link" data-section-target="options" type="button">Optionen</button>
+        <button class="nav-link" data-section-target="console" type="button">Konsole</button>
+        <button class="nav-link" data-section-target="worlds" type="button">Welten</button>
+        <button class="nav-link" data-section-target="players" type="button">Spieler</button>
+        <button class="nav-link" data-section-target="software" type="button">Software</button>
+        <button class="nav-link" data-section-target="logs" type="button">Logs</button>
+        <button class="nav-link" data-section-target="backups" type="button">Backups</button>
+      </nav>
+
+      <div class="sidebar-card">
+        <p class="card-label">Status</p>
+        <strong>Online 24/7</strong>
+        <span>50 Slots, hohe TPS und viel RAM für Survival, Events und Modpacks.</span>
+      </div>
+    </aside>
+
+    <main class="content">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">Minecraft Hosting</p>
+          <h2>Marley, Julius, Viel spaß auf meinem host LG Leon</h2>
+          <p class="hero-copy">
+            Ein Design für deinen eigenen Hosting-Service mit Admin-Zugriff für dich und deine Freunde,
+            Spigot-Auswahl, Welt-Upload, Logs und automatischen Backups.
+          </p>
+        </div>
+        <div class="hero-actions">
+          <button class="primary-button" id="createServerButton" type="button">Server kaufen für 0 EUR</button>
+          <button class="ghost-button" id="backupNowButton" type="button">Backup jetzt starten</button>
+        </div>
+      </header>
+
+      <section class="top-grid">
+        <article class="panel glow">
+          <p class="card-label">Aktiver Server</p>
+          <h3 id="serverNameDisplay">Noch kein Server erstellt</h3>
+          <div class="stat-grid">
+            <div>
+              <span>TPS</span>
+              <strong id="tpsDisplay">--</strong>
+            </div>
+            <div>
+              <span>RAM</span>
+              <strong id="ramDisplay">--</strong>
+            </div>
+            <div>
+              <span>Spieler</span>
+              <strong id="playerSlotsDisplay">0 / 0</strong>
+            </div>
+          </div>
+          <div class="status-row" id="serverStatusRow">
+            <span class="status-pill">Warte auf Erstellung</span>
+            <span class="status-pill">Software noch offen</span>
+            <span class="status-pill">Backups bereit</span>
+          </div>
+        </article>
+
+        <article class="panel">
+          <p class="card-label">Zugang</p>
+          <h3 id="welcomeTitle">Willkommen</h3>
+          <p class="muted" id="sessionStatus">Du bist nach dem Login im Panel.</p>
+          <ul class="feature-list">
+            <li>Admin-Account für dich ist vorbereitet</li>
+            <li>Freunde können später eigene Rollen bekommen</li>
+            <li>Server werden erst nach deiner Erstellung angezeigt</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="section active" id="overview">
+        <div class="section-header">
+          <div>
+            <p class="card-label">Panel</p>
+            <h3>Server Uebersicht</h3>
+          </div>
+          <span class="section-note">Erstelle zuerst deinen eigenen Server und wähle die Specs selbst aus</span>
+        </div>
+
+        <div class="overview-grid">
+          <article class="panel">
+            <p class="card-label">Server erstellen</p>
+            <form id="serverForm" class="form-grid">
+              <label>
+                Servername
+                <input id="serverNameInput" type="text" placeholder="z. B. Survival Realm">
+              </label>
+              <label>
+                Custom IP
+                <input id="serverIpInput" type="text" placeholder="z. B. play.skynode.gg">
+              </label>
+              <label>
+                RAM
+                <select id="serverRamInput">
+                  <option>8 GB</option>
+                  <option selected>16 GB</option>
+                  <option>24 GB</option>
+                  <option>32 GB</option>
+                </select>
+              </label>
+              <label>
+                Slots
+                <select id="serverSlotsInput">
+                  <option>10</option>
+                  <option>20</option>
+                  <option selected>50</option>
+                </select>
+              </label>
+              <label>
+                Software
+                <select id="serverSoftwareInput">
+                  <option selected>Spigot</option>
+                  <option>Paper</option>
+                  <option>Purpur</option>
+                  <option>Fabric</option>
+                  <option>Forge</option>
+                </select>
+              </label>
+              <label>
+                Version
+                <select id="serverVersionInput"></select>
+              </label>
+              <button class="primary-button" type="submit">Server erstellen</button>
+            </form>
+          </article>
+
+          <article class="panel">
+            <p class="card-label">Leistung</p>
+            <div class="meter">
+              <div>
+                <span>CPU Auslastung</span>
+                <strong id="cpuDisplay">--</strong>
+              </div>
+              <div class="bar"><span id="cpuBar" style="width: 0%"></span></div>
+            </div>
+            <div class="meter">
+              <div>
+                <span>RAM Nutzung</span>
+                <strong id="ramUsageDisplay">--</strong>
+              </div>
+              <div class="bar"><span id="ramBar" style="width: 0%"></span></div>
+            </div>
+            <div class="meter">
+              <div>
+                <span>View Distance Ziel</span>
+                <strong id="chunkValue">12 Chunks</strong>
+              </div>
+              <div class="bar accent"><span id="chunkPreview" style="width: 60%"></span></div>
+            </div>
+          </article>
+
+          <article class="panel">
+            <p class="card-label">Plan</p>
+            <h3>0 EUR Community Hosting</h3>
+            <p class="plan-price">0 EUR <span>pro Monat</span></p>
+            <ul class="feature-list compact">
+              <li>Du erstellst den Server selbst im Panel</li>
+              <li>Bis zu 50 Spieler</li>
+              <li>Forge, Fabric, Paper, Purpur und Spigot</li>
+              <li>Custom IP frei einstellbar</li>
+              <li>Automatische Backups und Welt-Upload</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="access">
+        <div class="section-header">
+          <div>
+            <p class="card-label">Zugriff</p>
+            <h3>Accounts und Rollen</h3>
+          </div>
+        </div>
+
+        <div class="two-column">
+          <article class="panel">
+            <form id="accessForm" class="form-grid">
+              <label>
+                Accountname
+                <input id="accountName" type="text" placeholder="z. B. Alex">
+              </label>
+              <label>
+                Rolle
+                <select id="accountRole">
+                  <option>Admin</option>
+                  <option>Moderator</option>
+                  <option>Support</option>
+                </select>
+              </label>
+              <button class="primary-button" type="submit">Account erstellen</button>
+            </form>
+          </article>
+
+          <article class="panel">
+            <p class="card-label">Teamliste</p>
+            <div id="accessList" class="list-card"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="options">
+        <div class="section-header">
+          <div>
+            <p class="card-label">Optionen</p>
+            <h3>Chunks, RAM und Performance</h3>
+          </div>
+        </div>
+
+        <div class="two-column">
+          <article class="panel">
+            <label class="range-block">
+              View Distance
+              <input id="chunkSlider" type="range" min="6" max="20" value="12">
+            </label>
+            <div class="inline-stats">
+              <div>
+                <span>Custom IP</span>
+                <strong id="serverIpDisplay">--</strong>
+              </div>
+              <div>
+                <span>Empfohlen</span>
+                <strong>10 - 12</strong>
+              </div>
+              <div>
+                <span>Max RAM</span>
+                <strong>16 GB</strong>
+              </div>
+              <div>
+                <span>Max Spieler</span>
+                <strong>50</strong>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel">
+            <div class="toggle-row">
+              <div>
+                <strong>Auto Restart</strong>
+                <p>Startet den Server sauber neu, wenn ein Update fertig ist.</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" checked>
+                <span></span>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <strong>TPS Schutz</strong>
+                <p>Warnt bei Lagspitzen und empfiehlt Einstellungen.</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" checked>
+                <span></span>
+              </label>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="console">
+        <div class="section-header">
+          <div>
+            <p class="card-label">Konsole</p>
+            <h3>Live Server Ausgabe</h3>
+          </div>
+        </div>
+
+        <article class="panel">
+          <div id="consoleOutput" class="console-output" aria-live="polite"></div>
+          <form id="consoleForm" class="console-form">
+            <input id="consoleInput" type="text" placeholder="say Willkommen auf dem Server">
+            <button class="primary-button" type="submit">Befehl senden</button>
+          </form>
+        </article>
+      </section>
+
+      <section class="section" id="worlds">
+        <div class="section-header">
+          <div>
+            <p class="card-label">Welten</p>
+            <h3>Weltdateien hochladen</h3>
+          </div>
+          <span class="section-note">Bis zu 2 GB pro Upload</span>
+        </div>
+
+        <article class="panel">
+          <div class="upload-card">
+            <div>
+              <strong>world_survival.zip</strong>
+              <p>Upload-Limit 2 GB, kompatibel mit Spigot und Paper.</p>
+            </div>
+            <label class="upload-button">
+              Datei waehlen
+              <input id="worldUpload" type="file">
+            </label>
+          </div>
+          <div class="bar upload-progress"><span id="uploadProgress" style="width: 42%"></span></div>
+          <p class="muted" id="uploadText">Bereit für Welt-Import. Aktueller Demo-Fortschritt: 42%</p>
+        </article>
+      </section>
+
+      <section class="section" id="players">
+        <div class="section-header">
+          <div>
+            <p class="card-label">Spieler</p>
+            <h3>Spieler Uebersicht</h3>
+          </div>
+        </div>
+
+        <div class="player-grid" id="playerGrid"></div>
+      </section>
+
+      <section class="section" id="software">
+        <div class="section-header">
+          <div>
+            <p class="card-label">Software</p>
+            <h3>Server Software waehlen</h3>
+          </div>
+        </div>
+
+        <article class="panel">
+          <div class="software-grid">
+            <button class="software-card active" data-software="Spigot" type="button">
+              <strong>Spigot</strong>
+              <span>Plugin freundlich und mit vielen Versionen ab 1.19</span>
+            </button>
+            <button class="software-card" data-software="Paper" type="button">
+              <strong>Paper</strong>
+              <span>Extra optimiert für bessere Performance</span>
+            </button>
+            <button class="software-card" data-software="Purpur" type="button">
+              <strong>Purpur</strong>
+              <span>Noch mehr Einstellungen für Server und Gameplay</span>
+            </button>
+            <button class="software-card" data-software="Fabric" type="button">
+              <strong>Fabric</strong>
+              <span>Leichtgewichtig fuer moderne Mods</span>
+            </button>
+            <button class="software-card" data-software="Forge" type="button">
+              <strong>Forge</strong>
+              <span>Klassische Mod-Plattform mit vielen Packs</span>
+            </button>
+          </div>
+          <p class="muted">Aktuelle Auswahl: <strong id="softwareValue">Spigot 1.21.1</strong></p>
+          <p class="muted">Verfügbare Versionen: <strong id="versionValue">1.19 bis 1.21.1</strong></p>
+        </article>
+      </section>
+
+      <section class="section" id="logs">
+        <div class="section-header">
+          <div>
+            <p class="card-label">Logs</p>
+            <h3>System Meldungen</h3>
+          </div>
+        </div>
+
+        <article class="panel">
+          <div class="log-list">
+            <div><span>18:14</span><strong>Backup abgeschlossen</strong></div>
+            <div><span>17:57</span><strong>Plugin EssentialsX geladen</strong></div>
+            <div><span>17:42</span><strong>Serverstart erfolgreich, Start-Backup erstellt</strong></div>
+            <div><span>17:35</span><strong>Neuer Admin Account fuer Lea angelegt</strong></div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section" id="backups">
+        <div class="section-header">
+          <div>
+            <p class="card-label">Backups</p>
+            <h3>Automatische und manuelle Sicherungen</h3>
+          </div>
+        </div>
+
+        <div class="two-column">
+          <article class="panel">
+            <div class="backup-timeline" id="backupList">
+              <div><strong>Auto Backup</strong><span>Heute, 18:00 Uhr</span></div>
+              <div><strong>Start Backup</strong><span>Heute, 17:42 Uhr</span></div>
+              <div><strong>Manuelles Backup</strong><span>Gestern, 21:15 Uhr</span></div>
+            </div>
+          </article>
+
+          <article class="panel">
+            <p class="muted">
+              Dein Wunsch ist hier schon eingebaut: Der Server erstellt alle 24 Stunden automatisch ein Backup,
+              kann jederzeit manuell sichern und legt beim Start direkt noch eins an.
+            </p>
+            <button class="primary-button" id="createExtraBackup" type="button">Manuelles Backup erstellen</button>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
