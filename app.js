@@ -1,4 +1,4 @@
-﻿const sections = document.querySelectorAll(".section");
+const sections = document.querySelectorAll(".section");
 const navLinks = document.querySelectorAll(".nav-link");
 const accessList = document.getElementById("accessList");
 const accessForm = document.getElementById("accessForm");
@@ -47,8 +47,16 @@ const ramUsageDisplay = document.getElementById("ramUsageDisplay");
 const ramBar = document.getElementById("ramBar");
 const serverIpDisplay = document.getElementById("serverIpDisplay");
 
-const teamMembers = [];
+const teamMembers = [
+  { name: "Marley", role: "Admin" },
+  { name: "Julius", role: "Admin" }
+];
 const players = [];
+const accounts = {
+  leon: { password: "SkyNodeHostingLeon", role: "Owner", displayName: "leon" },
+  marley: { password: "SkyNodeMarley", role: "Admin", displayName: "Marley" },
+  julius: { password: "SkyNodeJulius", role: "Admin", displayName: "Julius" }
+};
 const softwareVersions = {
   Spigot: ["1.19", "1.19.2", "1.19.4", "1.20", "1.20.1", "1.20.4", "1.20.6", "1.21", "1.21.1"],
   Paper: ["1.19", "1.19.4", "1.20", "1.20.1", "1.20.4", "1.20.6", "1.21", "1.21.1"],
@@ -224,14 +232,24 @@ navLinks.forEach((button) => {
 
 loginForm.addEventListener("submit", (event) => {
   event.preventDefault();
-  state.account.username = loginUsername.value.trim() || "Admin";
-  state.account.password = loginPassword.value.trim();
+
+  const username = loginUsername.value.trim().toLowerCase();
+  const password = loginPassword.value.trim();
+  const account = accounts[username];
+
+  if (!account || account.password !== password) {
+    loginStatus.textContent = "Login fehlgeschlagen. Bitte pruefe Benutzername und Passwort.";
+    return;
+  }
+
+  state.account.username = account.displayName;
+  state.account.password = password;
   state.loggedIn = true;
   loginStatus.textContent = `Eingeloggt als ${state.account.username}`;
   if (!teamMembers.find((member) => member.name === state.account.username)) {
     teamMembers.unshift({
       name: state.account.username,
-      role: "Owner"
+      role: account.role
     });
     renderTeam();
   }
