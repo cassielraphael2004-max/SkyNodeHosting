@@ -7,9 +7,6 @@ const accountRole = document.getElementById("accountRole");
 const consoleOutput = document.getElementById("consoleOutput");
 const consoleForm = document.getElementById("consoleForm");
 const consoleInput = document.getElementById("consoleInput");
-const chunkSlider = document.getElementById("chunkSlider");
-const chunkValue = document.getElementById("chunkValue");
-const chunkPreview = document.getElementById("chunkPreview");
 const playerGrid = document.getElementById("playerGrid");
 const softwareCards = document.querySelectorAll(".software-card");
 const softwareValue = document.getElementById("softwareValue");
@@ -18,6 +15,13 @@ const backupNowButton = document.getElementById("backupNowButton");
 const createExtraBackup = document.getElementById("createExtraBackup");
 const backupList = document.getElementById("backupList");
 const createServerButton = document.getElementById("createServerButton");
+const serverMenuButton = document.getElementById("serverMenuButton");
+const serverMenu = document.getElementById("serverMenu");
+const serverMenuList = document.getElementById("serverMenuList");
+const newServerMenuButton = document.getElementById("newServerMenuButton");
+const startServerButton = document.getElementById("startServerButton");
+const restartServerButton = document.getElementById("restartServerButton");
+const stopServerButton = document.getElementById("stopServerButton");
 const worldUpload = document.getElementById("worldUpload");
 const uploadText = document.getElementById("uploadText");
 const uploadProgress = document.getElementById("uploadProgress");
@@ -31,7 +35,6 @@ const welcomeTitle = document.getElementById("welcomeTitle");
 const sessionStatus = document.getElementById("sessionStatus");
 const serverForm = document.getElementById("serverForm");
 const serverNameInput = document.getElementById("serverNameInput");
-const serverIpInput = document.getElementById("serverIpInput");
 const serverRamInput = document.getElementById("serverRamInput");
 const serverSlotsInput = document.getElementById("serverSlotsInput");
 const serverSoftwareInput = document.getElementById("serverSoftwareInput");
@@ -46,6 +49,25 @@ const cpuBar = document.getElementById("cpuBar");
 const ramUsageDisplay = document.getElementById("ramUsageDisplay");
 const ramBar = document.getElementById("ramBar");
 const serverIpDisplay = document.getElementById("serverIpDisplay");
+const playersValue = document.getElementById("playersValue");
+const playerOptionMeta = document.getElementById("playerOptionMeta");
+const playerOptionSummary = document.getElementById("playerOptionSummary");
+const playersMinusButton = document.getElementById("playersMinusButton");
+const playersPlusButton = document.getElementById("playersPlusButton");
+const spawnProtectionValue = document.getElementById("spawnProtectionValue");
+const spawnProtectionMeta = document.getElementById("spawnProtectionMeta");
+const spawnProtectionSummary = document.getElementById("spawnProtectionSummary");
+const spawnProtectionMinusButton = document.getElementById("spawnProtectionMinusButton");
+const spawnProtectionPlusButton = document.getElementById("spawnProtectionPlusButton");
+const gamemodeSelect = document.getElementById("gamemodeSelect");
+const gamemodeMeta = document.getElementById("gamemodeMeta");
+const difficultySelect = document.getElementById("difficultySelect");
+const difficultyMeta = document.getElementById("difficultyMeta");
+const resourcePackInput = document.getElementById("resourcePackInput");
+const resourcePackMeta = document.getElementById("resourcePackMeta");
+const resourcePromptInput = document.getElementById("resourcePromptInput");
+const resourcePromptMeta = document.getElementById("resourcePromptMeta");
+const toggleBoxes = document.querySelectorAll(".toggle-box");
 
 const teamMembers = [
   { name: "Marley", role: "Admin" },
@@ -73,12 +95,29 @@ const consoleLines = [
 
 const state = {
   loggedIn: false,
-  server: null,
+  servers: [],
+  activeServerId: null,
   account: {
     username: "",
     password: ""
   }
 };
+
+function getActiveServer() {
+  return state.servers.find((server) => server.id === state.activeServerId) || null;
+}
+
+function buildServerIp(name) {
+  const slug = name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .replace(/-{2,}/g, "-");
+
+  return `${slug || "server"}.skynode.host`;
+}
 
 function renderTeam() {
   accessList.innerHTML = "";
@@ -94,7 +133,7 @@ function renderTeam() {
 function renderPlayers() {
   playerGrid.innerHTML = "";
 
-  if (!state.server) {
+  if (!getActiveServer()) {
     const emptyCard = document.createElement("article");
     emptyCard.className = "panel player-card";
     emptyCard.innerHTML = `
@@ -176,6 +215,16 @@ function addBackupEntry(label) {
   backupList.prepend(entry);
 }
 
+function updateServerControls() {
+  const activeServer = getActiveServer();
+  const hasServer = Boolean(activeServer);
+  const isOnline = hasServer && activeServer.status === "online";
+
+  startServerButton.disabled = !hasServer || isOnline;
+  restartServerButton.disabled = !hasServer || !isOnline;
+  stopServerButton.disabled = !hasServer || !isOnline;
+}
+
 function renderLoginState() {
   loginOverlay.classList.toggle("hidden", state.loggedIn);
   appShell.classList.toggle("app-shell-hidden", !state.loggedIn);
@@ -187,8 +236,40 @@ function renderLoginState() {
     : "Du bist nach dem Login im Panel.";
 }
 
+function renderServerMenu() {
+  const activeServer = getActiveServer();
+  serverMenuButton.textContent = activeServer ? `Server: ${activeServer.name}` : "Server";
+  serverMenuList.innerHTML = "";
+
+  if (state.servers.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "server-menu-item";
+    empty.innerHTML = "<span>Noch keine Server erstellt</span>";
+    serverMenuList.appendChild(empty);
+    return;
+  }
+
+  state.servers.forEach((server) => {
+    const item = document.createElement("div");
+    item.className = `server-menu-item${server.id === state.activeServerId ? " active" : ""}`;
+    item.innerHTML = `
+      <div>
+        <strong>${server.name}</strong>
+        <span>${server.status === "online" ? "Online" : "Offline"} • ${server.software} ${server.version}</span>
+      </div>
+      <div class="server-menu-actions">
+        <button class="icon-button" data-server-select="${server.id}" type="button">→</button>
+        <button class="icon-button danger" data-server-delete="${server.id}" type="button">×</button>
+      </div>
+    `;
+    serverMenuList.appendChild(item);
+  });
+}
+
 function renderServerState() {
-  if (!state.server) {
+  const activeServer = getActiveServer();
+
+  if (!activeServer) {
     serverNameDisplay.textContent = "Noch kein Server erstellt";
     tpsDisplay.textContent = "--";
     ramDisplay.textContent = "--";
@@ -204,24 +285,50 @@ function renderServerState() {
       <span class="status-pill">Software noch offen</span>
       <span class="status-pill">Backups bereit</span>
     `;
+    updateServerControls();
+    renderServerMenu();
     return;
   }
 
-  serverNameDisplay.textContent = state.server.name;
-  tpsDisplay.textContent = "20.0";
-  ramDisplay.textContent = state.server.ram;
-  playerSlotsDisplay.textContent = `0 / ${state.server.slots}`;
-  cpuDisplay.textContent = "24%";
-  cpuBar.style.width = "24%";
-  ramUsageDisplay.textContent = `2.1 / ${state.server.ram}`;
-  ramBar.style.width = "18%";
-  serverIpDisplay.textContent = state.server.ip;
-  softwareValue.textContent = `${state.server.software} ${state.server.version}`;
-  serverStatusRow.innerHTML = `
-    <span class="status-pill online">Online</span>
-    <span class="status-pill">${state.server.software} ${state.server.version}</span>
-    <span class="status-pill">${state.server.ip}</span>
-  `;
+  serverNameDisplay.textContent = activeServer.name;
+  tpsDisplay.textContent = activeServer.status === "online" ? "20.0" : "0.0";
+  ramDisplay.textContent = activeServer.ram;
+  playerSlotsDisplay.textContent = `0 / ${activeServer.slots}`;
+  cpuDisplay.textContent = activeServer.status === "online" ? "24%" : "0%";
+  cpuBar.style.width = activeServer.status === "online" ? "24%" : "0%";
+  ramUsageDisplay.textContent = activeServer.status === "online" ? `2.1 / ${activeServer.ram}` : `0 / ${activeServer.ram}`;
+  ramBar.style.width = activeServer.status === "online" ? "18%" : "0%";
+  serverIpDisplay.textContent = activeServer.ip;
+  softwareValue.textContent = `${activeServer.software} ${activeServer.version}`;
+  serverStatusRow.innerHTML = activeServer.status === "online"
+    ? `
+      <span class="status-pill online">Online</span>
+      <span class="status-pill">${activeServer.software} ${activeServer.version}</span>
+      <span class="status-pill">${activeServer.ip}</span>
+    `
+    : `
+      <span class="status-pill">Offline</span>
+      <span class="status-pill">${activeServer.software} ${activeServer.version}</span>
+      <span class="status-pill">${activeServer.ip}</span>
+    `;
+  updateServerControls();
+  renderServerMenu();
+}
+
+function updatePlayerOption(delta) {
+  const current = Number(playersValue.textContent);
+  const next = Math.min(200, Math.max(1, current + delta));
+  playersValue.textContent = String(next);
+  playerOptionMeta.textContent = String(next);
+  playerOptionSummary.textContent = String(next);
+}
+
+function updateSpawnProtection(delta) {
+  const current = Number(spawnProtectionValue.textContent);
+  const next = Math.min(32, Math.max(0, current + delta));
+  spawnProtectionValue.textContent = String(next);
+  spawnProtectionMeta.textContent = String(next);
+  spawnProtectionSummary.textContent = String(next);
 }
 
 navLinks.forEach((button) => {
@@ -260,24 +367,28 @@ serverForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
   const name = serverNameInput.value.trim();
-  const ip = serverIpInput.value.trim() || "play.skynode.gg";
   if (!name) {
     return;
   }
+  const ip = buildServerIp(name);
 
-  state.server = {
+  const newServer = {
+    id: `server-${Date.now()}`,
     name,
     ip,
     ram: serverRamInput.value,
     slots: serverSlotsInput.value,
     software: serverSoftwareInput.value,
-    version: serverVersionInput.value
+    version: serverVersionInput.value,
+    status: "offline"
   };
+  state.servers.push(newServer);
+  state.activeServerId = newServer.id;
 
   consoleLines.push(`[18:14:33] [Panel/INFO]: Server ${name} wurde erstellt`);
-  consoleLines.push(`[18:14:37] [Network/INFO]: Custom IP ${ip} wurde gesetzt`);
-  consoleLines.push(`[18:14:41] [Server/INFO]: ${state.server.software} ${state.server.version} wurde ausgewaehlt`);
-  consoleLines.push("[18:14:45] [Backup/INFO]: Start-Backup wurde vorbereitet");
+  consoleLines.push(`[18:14:37] [Network/INFO]: Server-IP ${ip} wurde automatisch erstellt`);
+  consoleLines.push(`[18:14:41] [Server/INFO]: ${newServer.software} ${newServer.version} wurde ausgewaehlt`);
+  consoleLines.push("[18:14:45] [Server/INFO]: Server wurde angelegt und wartet auf Start");
   renderServerState();
   renderConsole();
   renderPlayers();
@@ -313,10 +424,36 @@ consoleForm.addEventListener("submit", (event) => {
   consoleInput.value = "";
 });
 
-chunkSlider.addEventListener("input", () => {
-  const value = Number(chunkSlider.value);
-  chunkValue.textContent = `${value} Chunks`;
-  chunkPreview.style.width = `${((value - 6) / 14) * 100}%`;
+playersMinusButton.addEventListener("click", () => updatePlayerOption(-1));
+playersPlusButton.addEventListener("click", () => updatePlayerOption(1));
+spawnProtectionMinusButton.addEventListener("click", () => updateSpawnProtection(-1));
+spawnProtectionPlusButton.addEventListener("click", () => updateSpawnProtection(1));
+
+gamemodeSelect.addEventListener("change", () => {
+  gamemodeMeta.textContent = gamemodeSelect.value;
+});
+
+difficultySelect.addEventListener("change", () => {
+  difficultyMeta.textContent = difficultySelect.value;
+});
+
+resourcePackInput.addEventListener("input", () => {
+  resourcePackMeta.textContent = resourcePackInput.value.trim() || "-";
+});
+
+resourcePromptInput.addEventListener("input", () => {
+  resourcePromptMeta.textContent = resourcePromptInput.value.trim() || "-";
+});
+
+toggleBoxes.forEach((button) => {
+  button.addEventListener("click", () => {
+    const target = document.getElementById(button.dataset.toggleTarget);
+    const isOn = button.classList.contains("on");
+    button.classList.toggle("on", !isOn);
+    button.classList.toggle("off", isOn);
+    button.textContent = isOn ? "X" : "✓";
+    target.textContent = isOn ? "false" : "true";
+  });
 });
 
 serverSoftwareInput.addEventListener("change", () => {
@@ -350,6 +487,86 @@ createExtraBackup.addEventListener("click", () => {
 createServerButton.addEventListener("click", () => {
   setActiveSection("overview");
   serverNameInput.focus();
+});
+
+serverMenuButton.addEventListener("click", () => {
+  serverMenu.classList.toggle("hidden");
+});
+
+newServerMenuButton.addEventListener("click", () => {
+  serverMenu.classList.add("hidden");
+  setActiveSection("overview");
+  serverNameInput.focus();
+});
+
+serverMenuList.addEventListener("click", (event) => {
+  const selectButton = event.target.closest("[data-server-select]");
+  const deleteButton = event.target.closest("[data-server-delete]");
+
+  if (selectButton) {
+    state.activeServerId = selectButton.dataset.serverSelect;
+    serverMenu.classList.add("hidden");
+    renderServerState();
+    renderPlayers();
+  }
+
+  if (deleteButton) {
+    const serverId = deleteButton.dataset.serverDelete;
+    const serverToDelete = state.servers.find((server) => server.id === serverId);
+    state.servers = state.servers.filter((server) => server.id !== serverId);
+
+    if (state.activeServerId === serverId) {
+      state.activeServerId = state.servers[0]?.id || null;
+    }
+
+    if (serverToDelete) {
+      consoleLines.push(`[18:24:17] [Panel/INFO]: Server ${serverToDelete.name} wurde geloescht`);
+      renderConsole();
+    }
+
+    renderServerState();
+    renderPlayers();
+  }
+});
+
+startServerButton.addEventListener("click", () => {
+  const activeServer = getActiveServer();
+  if (!activeServer || activeServer.status === "online") {
+    return;
+  }
+
+  activeServer.status = "online";
+  consoleLines.push(`[18:20:03] [Server/INFO]: ${activeServer.name} wurde gestartet`);
+  consoleLines.push("[18:20:08] [Backup/INFO]: Start-Backup wurde erstellt");
+  addBackupEntry("Start Backup");
+  renderServerState();
+  renderConsole();
+});
+
+restartServerButton.addEventListener("click", () => {
+  const activeServer = getActiveServer();
+  if (!activeServer || activeServer.status !== "online") {
+    return;
+  }
+
+  consoleLines.push(`[18:21:11] [Server/INFO]: ${activeServer.name} wird neugestartet`);
+  consoleLines.push("[18:21:16] [Server/INFO]: Neustart erfolgreich abgeschlossen");
+  consoleLines.push("[18:21:18] [Backup/INFO]: Neustart-Backup wurde erstellt");
+  addBackupEntry("Neustart Backup");
+  renderServerState();
+  renderConsole();
+});
+
+stopServerButton.addEventListener("click", () => {
+  const activeServer = getActiveServer();
+  if (!activeServer || activeServer.status !== "online") {
+    return;
+  }
+
+  activeServer.status = "offline";
+  consoleLines.push(`[18:22:07] [Server/INFO]: ${activeServer.name} wurde gestoppt`);
+  renderServerState();
+  renderConsole();
 });
 
 worldUpload.addEventListener("change", () => {
