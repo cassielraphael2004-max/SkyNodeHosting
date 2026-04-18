@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8">
@@ -69,6 +69,16 @@
           </p>
         </div>
         <div class="hero-actions">
+          <div class="server-switcher">
+            <button class="ghost-button" id="serverMenuButton" type="button">Server</button>
+            <div class="server-menu hidden" id="serverMenu">
+              <div class="server-menu-header">
+                <strong>Server</strong>
+                <button class="primary-button small-button" id="newServerMenuButton" type="button">+</button>
+              </div>
+              <div class="server-menu-list" id="serverMenuList"></div>
+            </div>
+          </div>
           <button class="primary-button" id="createServerButton" type="button">Server kaufen für 0 EUR</button>
           <button class="ghost-button" id="backupNowButton" type="button">Backup jetzt starten</button>
         </div>
@@ -96,6 +106,11 @@
             <span class="status-pill">Warte auf Erstellung</span>
             <span class="status-pill">Software noch offen</span>
             <span class="status-pill">Backups bereit</span>
+          </div>
+          <div class="server-controls">
+            <button class="primary-button small-button" id="startServerButton" type="button">Starten</button>
+            <button class="warning-button small-button" id="restartServerButton" type="button">Neustarten</button>
+            <button class="danger-button small-button" id="stopServerButton" type="button">Stoppen</button>
           </div>
         </article>
 
@@ -128,10 +143,7 @@
                 Servername
                 <input id="serverNameInput" type="text" placeholder="z. B. Survival Realm">
               </label>
-              <label>
-                Custom IP
-                <input id="serverIpInput" type="text" placeholder="z. B. play.skynode.gg">
-              </label>
+              <p class="muted">Die Server-IP wird automatisch aus dem Namen erstellt.</p>
               <label>
                 RAM
                 <select id="serverRamInput">
@@ -200,7 +212,7 @@
               <li>Du erstellst den Server selbst im Panel</li>
               <li>Bis zu 50 Spieler</li>
               <li>Forge, Fabric, Paper, Purpur und Spigot</li>
-              <li>Custom IP frei einstellbar</li>
+              <li>IP wird automatisch aus dem Servernamen erstellt</li>
               <li>Automatische Backups und Welt-Upload</li>
             </ul>
           </article>
@@ -245,58 +257,219 @@
         <div class="section-header">
           <div>
             <p class="card-label">Optionen</p>
-            <h3>Chunks, RAM und Performance</h3>
+            <h3>Server Einstellungen</h3>
           </div>
         </div>
 
-        <div class="two-column">
-          <article class="panel">
-            <label class="range-block">
-              View Distance
-              <input id="chunkSlider" type="range" min="6" max="20" value="12">
-            </label>
-            <div class="inline-stats">
+        <div class="option-grid">
+          <article class="option-card">
+            <div class="option-main">
               <div>
-                <span>Custom IP</span>
-                <strong id="serverIpDisplay">--</strong>
+                <h4>Spieler</h4>
+                <p>max-players=<span id="playerOptionMeta">50</span></p>
               </div>
-              <div>
-                <span>Empfohlen</span>
-                <strong>10 - 12</strong>
-              </div>
-              <div>
-                <span>Max RAM</span>
-                <strong>16 GB</strong>
-              </div>
-              <div>
-                <span>Max Spieler</span>
-                <strong>50</strong>
+              <div class="stepper">
+                <button class="stepper-button" id="playersMinusButton" type="button">-</button>
+                <strong id="playersValue">50</strong>
+                <button class="stepper-button" id="playersPlusButton" type="button">+</button>
               </div>
             </div>
           </article>
 
-          <article class="panel">
-            <div class="toggle-row">
+          <article class="option-card">
+            <div class="option-main">
               <div>
-                <strong>Auto Restart</strong>
-                <p>Startet den Server sauber neu, wenn ein Update fertig ist.</p>
+                <h4>Spielmodus</h4>
+                <p>gamemode=<span id="gamemodeMeta">survival</span></p>
               </div>
-              <label class="switch">
-                <input type="checkbox" checked>
-                <span></span>
-              </label>
-            </div>
-            <div class="toggle-row">
-              <div>
-                <strong>TPS Schutz</strong>
-                <p>Warnt bei Lagspitzen und empfiehlt Einstellungen.</p>
-              </div>
-              <label class="switch">
-                <input type="checkbox" checked>
-                <span></span>
-              </label>
+              <select class="option-select" id="gamemodeSelect">
+                <option value="survival" selected>Ueberleben</option>
+                <option value="creative">Kreativ</option>
+                <option value="adventure">Abenteuer</option>
+                <option value="spectator">Zuschauer</option>
+              </select>
             </div>
           </article>
+
+          <article class="option-card">
+            <div class="option-main">
+              <div>
+                <h4>Schwierigkeit</h4>
+                <p>difficulty=<span id="difficultyMeta">normal</span></p>
+              </div>
+              <select class="option-select" id="difficultySelect">
+                <option value="peaceful">Friedlich</option>
+                <option value="easy">Einfach</option>
+                <option value="normal" selected>Normal</option>
+                <option value="hard">Schwer</option>
+              </select>
+            </div>
+          </article>
+
+          <article class="option-card">
+            <div class="option-main">
+              <div>
+                <h4>Whitelist</h4>
+                <p>white-list=<span id="whitelistMeta">false</span></p>
+              </div>
+              <button class="toggle-box off" data-toggle-target="whitelistMeta" type="button">X</button>
+            </div>
+          </article>
+
+          <article class="option-card">
+            <div class="option-main">
+              <div>
+                <h4>Gecrackt</h4>
+                <p>online-mode=<span id="crackedMeta">false</span></p>
+              </div>
+              <button class="toggle-box on" data-toggle-target="crackedMeta" type="button">✓</button>
+            </div>
+          </article>
+
+          <article class="option-card">
+            <div class="option-main">
+              <div>
+                <h4>PVP</h4>
+                <p>pvp=<span id="pvpMeta">true</span></p>
+              </div>
+              <button class="toggle-box on" data-toggle-target="pvpMeta" type="button">✓</button>
+            </div>
+          </article>
+
+          <article class="option-card">
+            <div class="option-main">
+              <div>
+                <h4>Befehlsblöcke</h4>
+                <p>enable-command-block=<span id="commandBlockMeta">true</span></p>
+              </div>
+              <button class="toggle-box on" data-toggle-target="commandBlockMeta" type="button">✓</button>
+            </div>
+          </article>
+
+          <article class="option-card">
+            <div class="option-main">
+              <div>
+                <h4>Fliegen</h4>
+                <p>allow-flight=<span id="flightMeta">true</span></p>
+              </div>
+              <button class="toggle-box on" data-toggle-target="flightMeta" type="button">✓</button>
+            </div>
+          </article>
+
+          <article class="option-card">
+            <div class="option-main">
+              <div>
+                <h4>Tiere</h4>
+                <p>spawn-animals=<span id="animalsMeta">true</span></p>
+              </div>
+              <button class="toggle-box on" data-toggle-target="animalsMeta" type="button">✓</button>
+            </div>
+          </article>
+
+          <article class="option-card">
+            <div class="option-main">
+              <div>
+                <h4>Monster</h4>
+                <p>spawn-monsters=<span id="monstersMeta">true</span></p>
+              </div>
+              <button class="toggle-box on" data-toggle-target="monstersMeta" type="button">✓</button>
+            </div>
+          </article>
+
+          <article class="option-card">
+            <div class="option-main">
+              <div>
+                <h4>Dorfbewohner</h4>
+                <p>spawn-npcs=<span id="npcsMeta">true</span></p>
+              </div>
+              <button class="toggle-box on" data-toggle-target="npcsMeta" type="button">✓</button>
+            </div>
+          </article>
+
+          <article class="option-card">
+            <div class="option-main">
+              <div>
+                <h4>Nether</h4>
+                <p>allow-nether=<span id="netherMeta">true</span></p>
+              </div>
+              <button class="toggle-box on" data-toggle-target="netherMeta" type="button">✓</button>
+            </div>
+          </article>
+
+          <article class="option-card">
+            <div class="option-main">
+              <div>
+                <h4>Spielmodus erzwingen</h4>
+                <p>force-gamemode=<span id="forceGamemodeMeta">false</span></p>
+              </div>
+              <button class="toggle-box off" data-toggle-target="forceGamemodeMeta" type="button">X</button>
+            </div>
+          </article>
+
+          <article class="option-card">
+            <div class="option-main">
+              <div>
+                <h4>Spawn Schutz</h4>
+                <p>spawn-protection=<span id="spawnProtectionMeta">0</span></p>
+              </div>
+              <div class="stepper">
+                <button class="stepper-button" id="spawnProtectionMinusButton" type="button">-</button>
+                <strong id="spawnProtectionValue">0</strong>
+                <button class="stepper-button" id="spawnProtectionPlusButton" type="button">+</button>
+              </div>
+            </div>
+          </article>
+
+          <article class="option-card">
+            <div class="option-main">
+              <div>
+                <h4>Ressourcenpaket erforderlich</h4>
+                <p>require-resource-pack=<span id="resourceRequiredMeta">true</span></p>
+              </div>
+              <button class="toggle-box on" data-toggle-target="resourceRequiredMeta" type="button">✓</button>
+            </div>
+          </article>
+        </div>
+
+        <article class="panel option-panel-wide">
+          <div class="resource-row">
+            <div>
+              <h4>Ressourcenpaket</h4>
+              <p>resource-pack=<span id="resourcePackMeta">https://packs.download/skynode-pack.zip</span></p>
+            </div>
+            <input id="resourcePackInput" type="text" value="https://packs.download/skynode-pack.zip">
+          </div>
+        </article>
+
+        <article class="panel option-panel-wide">
+          <div class="resource-row">
+            <div>
+              <h4>Ressourcenpaket-Aufforderung</h4>
+              <p>resource-pack-prompt=<span id="resourcePromptMeta">Bitte akzeptieren sie das Texturenpaket, um weiterzugehen!</span></p>
+            </div>
+            <input id="resourcePromptInput" type="text" value="Bitte akzeptieren sie das Texturenpaket, um weiterzugehen!">
+          </div>
+        </article>
+
+        <article class="panel option-panel-wide option-summary">
+          <div class="inline-stats">
+            <div>
+              <span>Custom IP</span>
+              <strong id="serverIpDisplay">--</strong>
+            </div>
+            <div>
+              <span>Max RAM</span>
+              <strong>16 GB</strong>
+            </div>
+            <div>
+              <span>Max Spieler</span>
+              <strong id="playerOptionSummary">50</strong>
+            </div>
+            <div>
+              <span>Spawn Schutz</span>
+              <strong id="spawnProtectionSummary">0</strong>
+            </div>
+          </div>
         </div>
       </section>
 
