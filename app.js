@@ -63,7 +63,7 @@ const gamemodeSelect = document.getElementById("gamemodeSelect");
 const gamemodeMeta = document.getElementById("gamemodeMeta");
 const difficultySelect = document.getElementById("difficultySelect");
 const difficultyMeta = document.getElementById("difficultyMeta");
-const resourcePackInput = document.getElementById("resourcePackInput");
+const resourcePackFileInput = document.getElementById("resourcePackFileInput");
 const resourcePackMeta = document.getElementById("resourcePackMeta");
 const resourcePromptInput = document.getElementById("resourcePromptInput");
 const resourcePromptMeta = document.getElementById("resourcePromptMeta");
@@ -437,8 +437,15 @@ difficultySelect.addEventListener("change", () => {
   difficultyMeta.textContent = difficultySelect.value;
 });
 
-resourcePackInput.addEventListener("input", () => {
-  resourcePackMeta.textContent = resourcePackInput.value.trim() || "-";
+resourcePackFileInput.addEventListener("change", () => {
+  const file = resourcePackFileInput.files[0];
+  if (!file) {
+    resourcePackMeta.textContent = "Kein Paket ausgewaehlt";
+    return;
+  }
+
+  const sizeInMb = (file.size / (1024 * 1024)).toFixed(1);
+  resourcePackMeta.textContent = `${file.name} (${sizeInMb} MB)`;
 });
 
 resourcePromptInput.addEventListener("input", () => {
