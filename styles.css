@@ -761,6 +761,11 @@ select {
   color: white;
 }
 
+.option-upload-button {
+  justify-self: stretch;
+  text-align: center;
+}
+
 .option-summary .inline-stats div {
   min-width: 150px;
 }
