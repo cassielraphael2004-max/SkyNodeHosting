@@ -40,7 +40,7 @@
       </div>
 
       <nav class="sidebar-nav" aria-label="Bereiche">
-        <button class="nav-link active" data-section-target="overview" type="button">Uebersicht</button>
+        <button class="nav-link active" data-section-target="overview" type="button">Übersicht</button>
         <button class="nav-link" data-section-target="access" type="button">Zugriff</button>
         <button class="nav-link" data-section-target="options" type="button">Optionen</button>
         <button class="nav-link" data-section-target="console" type="button">Konsole</button>
@@ -63,10 +63,6 @@
         <div>
           <p class="eyebrow">Minecraft Hosting</p>
           <h2>Marley, Julius, Viel spaß auf meinem host LG Leon</h2>
-          <p class="hero-copy">
-            Ein Design für deinen eigenen Hosting-Service mit Admin-Zugriff für dich und deine Freunde,
-            Spigot-Auswahl, Welt-Upload, Logs und automatischen Backups.
-          </p>
         </div>
         <div class="hero-actions">
           <div class="server-switcher">
@@ -283,7 +279,7 @@
                 <p>gamemode=<span id="gamemodeMeta">survival</span></p>
               </div>
               <select class="option-select" id="gamemodeSelect">
-                <option value="survival" selected>Ueberleben</option>
+                <option value="survival" selected>überleben</option>
                 <option value="creative">Kreativ</option>
                 <option value="adventure">Abenteuer</option>
                 <option value="spectator">Zuschauer</option>
@@ -435,9 +431,12 @@
           <div class="resource-row">
             <div>
               <h4>Ressourcenpaket</h4>
-              <p>resource-pack=<span id="resourcePackMeta">https://packs.download/skynode-pack.zip</span></p>
+              <p>resource-pack=<span id="resourcePackMeta">Kein Paket ausgewaehlt</span></p>
             </div>
-            <input id="resourcePackInput" type="text" value="https://packs.download/skynode-pack.zip">
+            <label class="upload-button option-upload-button">
+              Paket vom PC auswaehlen
+              <input id="resourcePackFileInput" type="file" accept=".zip,.rar,.7z">
+            </label>
           </div>
         </article>
 
