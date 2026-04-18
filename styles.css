@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   color-scheme: dark;
   --bg: #07111f;
   --bg-soft: #101c2f;
@@ -203,11 +203,14 @@ button {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
+  position: relative;
 }
 
 .primary-button,
 .ghost-button,
-.upload-button {
+.upload-button,
+.warning-button,
+.danger-button {
   padding: 14px 18px;
   border-radius: 16px;
   font-weight: 700;
@@ -226,9 +229,99 @@ button {
   border: 1px solid var(--border);
 }
 
+.warning-button {
+  color: #201102;
+  background: linear-gradient(135deg, #ffbf69, #ffd98f);
+  box-shadow: 0 12px 26px rgba(255, 191, 105, 0.24);
+}
+
+.danger-button {
+  color: #fff4f4;
+  background: linear-gradient(135deg, #ff6b6b, #d9485f);
+  box-shadow: 0 12px 26px rgba(217, 72, 95, 0.24);
+}
+
 .small-button {
   padding: 10px 14px;
   border-radius: 12px;
+}
+
+.server-switcher {
+  position: relative;
+}
+
+.server-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 320px;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(11, 22, 40, 0.98);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  z-index: 8;
+}
+
+.server-menu.hidden {
+  display: none;
+}
+
+.server-menu-header,
+.server-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.server-menu-header {
+  margin-bottom: 12px;
+}
+
+.server-menu-list {
+  display: grid;
+  gap: 10px;
+}
+
+.server-menu-item {
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.server-menu-item.active {
+  outline: 1px solid rgba(76, 194, 255, 0.5);
+  background: rgba(76, 194, 255, 0.12);
+}
+
+.server-menu-item strong,
+.server-menu-item span {
+  display: block;
+}
+
+.server-menu-item span {
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.server-menu-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.icon-button {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  color: white;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.icon-button.danger {
+  background: rgba(217, 72, 95, 0.2);
 }
 
 .top-grid,
@@ -249,6 +342,12 @@ button {
 
 .two-column {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.option-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
 }
 
 .panel {
@@ -294,6 +393,19 @@ button {
 
 .status-row {
   margin-top: 16px;
+}
+
+.server-controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.server-controls button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 .status-pill {
@@ -539,6 +651,120 @@ select {
   background: rgba(76, 194, 255, 0.12);
 }
 
+.option-card {
+  padding: 0;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #2b3947;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.option-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px;
+  background: #ececec;
+  color: #22364b;
+}
+
+.option-main h4,
+.resource-row h4 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+}
+
+.option-main p,
+.resource-row p {
+  margin: 0;
+  color: #c6d3e1;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 0.78rem;
+}
+
+.option-main > div:first-child p,
+.resource-row > div p {
+  color: #8da2ba;
+}
+
+.option-select {
+  min-width: 170px;
+  border-radius: 8px;
+  background: #334250;
+  color: #f4f8ff;
+  border: 0;
+  padding: 10px 14px;
+}
+
+.toggle-box {
+  width: 58px;
+  height: 34px;
+  border-radius: 6px;
+  font-size: 1.5rem;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+  border: 0;
+}
+
+.toggle-box.on {
+  background: #32d88d;
+  color: white;
+}
+
+.toggle-box.off {
+  background: #ff4876;
+  color: white;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #334250;
+  color: white;
+}
+
+.stepper strong {
+  min-width: 56px;
+  text-align: center;
+  padding: 8px 10px;
+}
+
+.stepper-button {
+  width: 34px;
+  height: 34px;
+  background: #3e5061;
+  color: white;
+  font-size: 1.2rem;
+}
+
+.option-panel-wide {
+  margin-top: 18px;
+}
+
+.resource-row {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 18px;
+  align-items: center;
+}
+
+.resource-row input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #334250;
+  color: white;
+}
+
+.option-summary .inline-stats div {
+  min-width: 150px;
+}
+
 .log-list span,
 .backup-timeline span {
   color: var(--warning);
@@ -564,8 +790,13 @@ select {
 
   .top-grid,
   .overview-grid,
+  .option-grid,
   .two-column,
   .player-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .resource-row {
     grid-template-columns: 1fr;
   }
 }
